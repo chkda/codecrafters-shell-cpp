@@ -14,22 +14,36 @@ std::vector<std::string> stringSplit(const std::string &input, char delimiter) {
     return tokens;
 }
 
-bool checkExitCommand(const std::string &command) {
-    std::vector<std::string> tokens = stringSplit(command, ' ');
-    if (tokens.size() != 2) {
-        return false;
+void echoCommand(const std::vector<std::string> &tokens) {
+    for (int i=1; i<tokens.size(); i++) {
+        std::cout<<tokens.at(i)<<" ";
     }
+    std::cout<<std::endl;
+}
 
-    if (tokens.at(0) != "exit") {
-        return false;
+void exitCommand(const std::vector<std::string> &tokens) {
+    if (tokens.size() != 2) {
+        std::cerr << "Error : too many args"<<std::endl;
+        return ;
     }
 
     if (tokens.at(1) != "0"){
-//        std::cerr <<"Error: invalid exit code: " << tokens.at(1) << std::endl;
-        return false;
+        std::cerr <<"Error: invalid exit code: " << tokens.at(1) << std::endl;
+        return;
     }
-    return true;
+    exit(0);
 
+}
+
+void commandEvaluator(const std::string &command) {
+    std::vector<std::string> tokens = stringSplit(command, ' ');
+    if (tokens.at(0) == "exit") {
+        exitCommand(tokens);
+    } else if (tokens.at(0) == "echo") {
+        echoCommand(tokens);
+    } else {
+        std::cout << command <<": command not found "<< std::endl;
+    }
 }
 
 int main() {
@@ -43,11 +57,9 @@ int main() {
       std::string input;
       std::getline(std::cin, input);
 
-      if (checkExitCommand(input)) {
-          exit(0);
-      }
+      commandEvaluator(input);
 
-      std::cout << input <<": command not found "<< std::endl;
+
   }
-
+  return 0;
 }
