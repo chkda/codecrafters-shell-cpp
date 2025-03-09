@@ -61,7 +61,8 @@ void typeCommand(const std::vector <std::string> &tokens) {
     // Check in PATH
     for (std::string path: paths) {
         if (checkIfFileExists(path, tokens.at(1))) {
-            std::cout << tokens.at(1) << " is a shell builtin "<< std::endl;
+            std::cout << tokens.at(1) << " is " << path + "/"
+            tokens.at(1) << std::endl;
             return;
         }
     }
