@@ -107,6 +107,17 @@ void commandEvaluator(const std::string &command) {
     } else if (option == Options::TYPE) {
         typeCommand(tokens);
     } else {
+        // Check custom program
+        std::string pathEnv = getPathEnvString();
+        std::vector<std::string> paths = stringSplit(pathEnv, ':');
+
+        for (std::string path : paths) {
+            if (checkIfFileExists(path, tokens.at(0))) {
+                system(command.c_str());
+                return;
+            }
+        }
+
         std::cout << command << ": command not found " << std::endl;
     }
 }
