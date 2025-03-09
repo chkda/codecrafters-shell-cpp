@@ -58,18 +58,19 @@ void typeCommand(const std::vector <std::string> &tokens) {
 
     std::string pathEnv = getPathEnvString();
     std::vector <std::string> paths = stringSplit(pathEnv, ':');
-    // Check in PATH
-    for (std::string path: paths) {
-        if (checkIfFileExists(path, tokens.at(1))) {
-            std::cout << tokens.at(1) << " is " << path + "/" + tokens.at(1) << std::endl;
-            return;
-        }
-    }
+
     // Check in custom options
     auto it = optionMap.find(tokens.at(1));
     if (it != optionMap.end()) {
         std::cout << it->first << " is a shell builtin" << std::endl;
     } else {
+        // Check in PATH
+        for (std::string path: paths) {
+            if (checkIfFileExists(path, tokens.at(1))) {
+                std::cout << tokens.at(1) << " is " << path + "/" + tokens.at(1) << std::endl;
+                return;
+            }
+        }
         std::cout << tokens.at(1) << ": not found" << std::endl;
     }
     return;
