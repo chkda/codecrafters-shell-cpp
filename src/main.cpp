@@ -2,6 +2,20 @@
 #include <vector>
 #include <sstream>
 #include <cstdlib>
+#include <unordered_map>
+
+enum class Options {ECHO, EXIT, TYPE, INVALID};
+
+const std::unordered_map<std::string, Options> optionMap = {
+        {"echo", Options::ECHO},
+        {"exit", Options::EXIT},
+        {"type", Options::TYPE}
+};
+
+Options stringToOptions(const std::string &str) {
+    auto it = optionMap.find(str) ;
+    return (it != optionMap.end()) ? it->second : Options::INVALID;
+}
 
 std::vector<std::string> stringSplit(const std::string &input, char delimiter) {
     std::vector<std::string> tokens;
@@ -12,6 +26,21 @@ std::vector<std::string> stringSplit(const std::string &input, char delimiter) {
         tokens.push_back(token);
     }
     return tokens;
+}
+
+void typeCommand(const std::vector<std::string> &tokens) {
+    if (tokens.size() != 2) {
+        std::cerr<<"Error: too many args "<< std::endl;
+        return;
+    }
+
+    auto it = optionMap.find(tokens.at(1));
+    if (it != optionMap.end()) {
+        std::cout<<it->first<<" is a shell builtin"<<std::endl;
+    } else {
+        std::cout<<tokens.at(1)<<": not found"<<std::endl;
+    }
+    return;
 }
 
 void echoCommand(const std::vector<std::string> &tokens) {
@@ -37,10 +66,13 @@ void exitCommand(const std::vector<std::string> &tokens) {
 
 void commandEvaluator(const std::string &command) {
     std::vector<std::string> tokens = stringSplit(command, ' ');
-    if (tokens.at(0) == "exit") {
+    Options option = stringToOptions(tokens.at(0));
+    if (option == Options::EXIT) {
         exitCommand(tokens);
-    } else if (tokens.at(0) == "echo") {
+    } else if (option == Options::ECHO) {
         echoCommand(tokens);
+    } else if (option == Options::TYPE) {
+        typeCommand(tokens);
     } else {
         std::cout << command <<": command not found "<< std::endl;
     }
