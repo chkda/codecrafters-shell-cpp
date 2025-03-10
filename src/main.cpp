@@ -6,13 +6,14 @@
 #include <filesystem>
 
 enum class Options {
-    ECHO, EXIT, TYPE, INVALID
+    ECHO, EXIT, TYPE, INVALID, PWD
 };
 
 const std::unordered_map <std::string, Options> optionMap = {
         {"echo", Options::ECHO},
         {"exit", Options::EXIT},
-        {"type", Options::TYPE}
+        {"type", Options::TYPE},
+        {"pwd",  Options::PWD}
 };
 
 std::string getPathEnvString() {
@@ -94,7 +95,16 @@ void exitCommand(const std::vector <std::string> &tokens) {
         return;
     }
     exit(0);
+}
 
+std::string getCurrentWorkingDirectory() {
+    std::string path = std::filesystem::current_path().string();
+    return path;
+}
+
+void pwdCommand() {
+    std::string path = getCurrentWorkingDirectory();
+    std::cout << path << std::endl;
 }
 
 void commandEvaluator(const std::string &command) {
@@ -106,12 +116,14 @@ void commandEvaluator(const std::string &command) {
         echoCommand(tokens);
     } else if (option == Options::TYPE) {
         typeCommand(tokens);
+    } else if (option == Options::PWD) {
+        pwdCommand();
     } else {
         // Check custom program
         std::string pathEnv = getPathEnvString();
-        std::vector<std::string> paths = stringSplit(pathEnv, ':');
+        std::vector <std::string> paths = stringSplit(pathEnv, ':');
 
-        for (std::string path : paths) {
+        for (std::string path: paths) {
             if (checkIfFileExists(path, tokens.at(0))) {
                 system(command.c_str());
                 return;
