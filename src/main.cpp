@@ -62,7 +62,7 @@ bool changeCurrentWorkingDirectory(const std::string &path) {
         std::filesystem::current_path(path);
         return true;
     } catch (const std::filesystem::filesystem_error &err) {
-        std::cerr << "cd:" << path << ": No such file or directory" << std::endl;
+        std::cerr << "cd: " << path << ": No such file or directory" << std::endl;
         return false;
     }
 }
