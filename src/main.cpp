@@ -17,8 +17,8 @@ const std::unordered_map <std::string, Options> optionMap = {
         {"cd",   Options::CD}
 };
 
-std::string getPathEnvString() {
-    const char *pathVar = std::getenv("PATH");
+std::string getEnvString(const std::string &env) {
+    const char *pathVar = std::getenv(env.c_str());
     if (pathVar == nullptr) {
         return "";
     }
@@ -73,7 +73,7 @@ void typeCommand(const std::vector <std::string> &tokens) {
         return;
     }
 
-    std::string pathEnv = getPathEnvString();
+    std::string pathEnv = getEnvString("PATH");
     std::vector <std::string> paths = stringSplit(pathEnv, ':');
 
     // Check in custom options
@@ -128,7 +128,13 @@ void cdCommand(const std::vector <std::string> &tokens) {
         return;
     }
 
-    changeCurrentWorkingDirectory(tokens.at(1));
+    if (tokens.at(1) == "~") {
+        std::string homeEnv = getEnvString("HOME");
+        changeCurrentWorkingDirectory(homeEnv);
+    } else {
+        changeCurrentWorkingDirectory(tokens.at(1));
+    }
+
     return;
 }
 
@@ -147,7 +153,7 @@ void commandEvaluator(const std::string &command) {
         cdCommand(tokens);
     } else {
         // Check custom program
-        std::string pathEnv = getPathEnvString();
+        std::string pathEnv = getEnvString("PATH");
         std::vector <std::string> paths = stringSplit(pathEnv, ':');
 
         for (std::string path: paths) {
