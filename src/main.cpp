@@ -6,14 +6,15 @@
 #include <filesystem>
 
 enum class Options {
-    ECHO, EXIT, TYPE, INVALID, PWD
+    ECHO, EXIT, TYPE, INVALID, PWD, CD
 };
 
 const std::unordered_map <std::string, Options> optionMap = {
         {"echo", Options::ECHO},
         {"exit", Options::EXIT},
         {"type", Options::TYPE},
-        {"pwd",  Options::PWD}
+        {"pwd",  Options::PWD},
+        {"cd",   Options::CD}
 };
 
 std::string getPathEnvString() {
@@ -49,6 +50,21 @@ bool checkIfFileExists(const std::string &dir, const std::string &file) {
         }
     }
     return false;
+}
+
+std::string getCurrentWorkingDirectory() {
+    std::string path = std::filesystem::current_path().string();
+    return path;
+}
+
+bool changeCurrentWorkingDirectory(const std::string &path) {
+    try {
+        std::filesystem::current_path(path);
+        return true;
+    } catch (const std::filesystem::filesystem_error &err) {
+        std::cerr << "cd:" << path << ": No such file or directory" << std::endl;
+        return false;
+    }
 }
 
 void typeCommand(const std::vector <std::string> &tokens) {
@@ -97,14 +113,23 @@ void exitCommand(const std::vector <std::string> &tokens) {
     exit(0);
 }
 
-std::string getCurrentWorkingDirectory() {
-    std::string path = std::filesystem::current_path().string();
-    return path;
-}
-
 void pwdCommand() {
     std::string path = getCurrentWorkingDirectory();
     std::cout << path << std::endl;
+}
+
+void cdCommand(const std::vector <std::string> &tokens) {
+    if (tokens.size() > 2) {
+        std::cerr << "Error: too many args" << std::endl;
+        return;
+    }
+    if (tokens.size() < 2) {
+        std::cerr << "Error: too few args" << std::endl;
+        return;
+    }
+
+    changeCurrentWorkingDirectory(tokens.at(1));
+    return;
 }
 
 void commandEvaluator(const std::string &command) {
@@ -118,6 +143,8 @@ void commandEvaluator(const std::string &command) {
         typeCommand(tokens);
     } else if (option == Options::PWD) {
         pwdCommand();
+    } else if (option == Options::CD) {
+        cdCommand(tokens);
     } else {
         // Check custom program
         std::string pathEnv = getPathEnvString();
