@@ -54,6 +54,17 @@ std::vector <std::string> stringSplit(const std::string &input, char delimiter) 
     return tokens;
 }
 
+std::vector <std::string> stringSplitOverSpaces(const std::string &input) {
+    std::vector <std::string> tokens;
+    std::stringstream ss(input);
+    std::string token;
+
+    while (ss >> token) {
+        tokens.push_back(token);
+    }
+    return tokens;
+}
+
 bool checkIfFileExists(const std::string &dir, const std::string &file) {
     auto it = std::filesystem::directory_iterator(dir);
     std::string path = dir + "/" + file;
@@ -153,7 +164,7 @@ void cdCommand(const std::vector <std::string> &tokens) {
 
 void commandEvaluator(std::string &command) {
     std::string processedCommand = preprocessCommand(command);
-    std::vector <std::string> tokens = stringSplit(processedCommand, ' ');
+    std::vector <std::string> tokens = stringSplitOverSpaces(processedCommand);
     Options option = stringToOptions(tokens.at(0));
     if (option == Options::EXIT) {
         exitCommand(tokens);
