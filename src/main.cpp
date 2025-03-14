@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <unordered_map>
 #include <filesystem>
+#include <algorithm>
 
 enum class Options {
     ECHO, EXIT, TYPE, INVALID, PWD, CD
