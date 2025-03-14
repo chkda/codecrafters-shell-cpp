@@ -25,6 +25,18 @@ std::string getEnvString(const std::string &env) {
     return std::string(pathVar);
 }
 
+std::string replaceSingleQuotes(std::string &str) {
+    std::replace(str.begin(), str.end(), '\'', ' ');
+    return str;
+}
+
+std::string preprocessCommand(std::string &command) {
+//    std::string modifiedCommand;
+//    modifiedCommand = removeSingleQuotes(command);
+//    return modifiedCommand;
+    return replaceSingleQuotes(command);
+}
+
 Options stringToOptions(const std::string &str) {
     auto it = optionMap.find(str);
     return (it != optionMap.end()) ? it->second : Options::INVALID;
@@ -138,8 +150,9 @@ void cdCommand(const std::vector <std::string> &tokens) {
     return;
 }
 
-void commandEvaluator(const std::string &command) {
-    std::vector <std::string> tokens = stringSplit(command, ' ');
+void commandEvaluator(std::string &command) {
+    std::string processedCommand = preprocessCommand(command);
+    std::vector <std::string> tokens = stringSplit(processedCommand, ' ');
     Options option = stringToOptions(tokens.at(0));
     if (option == Options::EXIT) {
         exitCommand(tokens);
